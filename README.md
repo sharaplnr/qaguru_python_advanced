@@ -1,2 +1,2 @@
-# qaguru_python_advanced
-Прохождение курса qa.guru Python Advanced
+# reqres-service-v1
+Каюсь за пустой readme :)
