@@ -1,11 +1,16 @@
-from fastapi import FastAPI, HTTPException
+from datetime import datetime
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 from models.single_user import ResponseData
+from models.create_user import CreateUserResponse, CreateUserRequest
+from models.update_user import UpdateUserResponse, UpdateUserRequest
+from random import randint
+
 
 app = FastAPI()
 
 @app.get("/api/users/{user_id}", response_model=ResponseData)
 def get_user(user_id: int):
-    # Mock data for demonstration purposes
     users = {
         2: {
             "id": 2,
@@ -23,18 +28,55 @@ def get_user(user_id: int):
 
     user = users.get(user_id)
     if not user:
-        # todo improve exception
-        raise HTTPException(status_code=404, detail="User not found")
+        return JSONResponse(status_code=404, content={})
 
     return {
         "data": user,
         "support": support_info,
     }
 
+@app.post("/api/users", status_code=201, response_model=CreateUserResponse)
+def create_user(user: CreateUserRequest):
+    user_id = str(randint(1, 999))
+    created_at = datetime.utcnow().isoformat() + 'Z'
 
-# To run this app, use the following command in your terminal:
-# uvicorn filename:app --reload
+    response_data = CreateUserResponse(
+        name=user.name,
+        job=user.job,
+        id=user_id,
+        createdAt=created_at
+    )
+
+    return response_data
+
+@app.put("/api/users/{user_id}")
+def put_user(user_id: int, user: UpdateUserRequest):
+    updated_at = datetime.utcnow().isoformat() + 'Z'
+
+    response_data = UpdateUserResponse(
+        name=user.name,
+        job=user.job,
+        updatedAt=updated_at
+    )
+
+    return response_data
+
+@app.patch("/api/users/{user_id}")
+def put_user(user_id: int, user: UpdateUserRequest):
+    updated_at = datetime.utcnow().isoformat() + 'Z'
+
+    response_data = UpdateUserResponse(
+        name=user.name,
+        job=user.job,
+        updatedAt=updated_at
+    )
+
+    return response_data
+
+@app.delete("/api/users/{user_id}")
+def delete_user(user_id: int):
+    return {}
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="localhost", port=8080)
